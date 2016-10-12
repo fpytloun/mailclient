@@ -1,0 +1,22 @@
+## SMTP
+unset smtp_url
+unset ssl_starttls
+unset ssl_force_tls
+unset smtp_authenticators
+unset smtp_pass
+unset from
+set realname = "Filip Pytloun"
+
+unset signature
+
+set sidebar_visible = no
+
+## Folders
+unset folder
+set spoolfile=/var/mail/filip
+
+## Hotkeys
+macro index,pager d "<delete-message>"
+
+## Theme
+source ~/.mutt/system/colors

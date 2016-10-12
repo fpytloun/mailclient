@@ -1,0 +1,234 @@
+set timeout=15
+set mail_check=90
+set imap_keepalive=180
+set imap_idle
+
+set smtp_url = "smtp://localhost:587"
+
+## Accounts
+macro index <F1> '<sync-mailbox><enter-command>source ~/.mutt/personal/muttrc<enter><change-folder>!<enter>'
+macro index <F2> '<sync-mailbox><enter-command>source ~/.mutt/tcpcloud/muttrc<enter><change-folder>!<enter>'
+macro index <F3> '<sync-mailbox><enter-command>source ~/.mutt/mirantis/muttrc<enter><change-folder>!<enter>'
+macro index <F4> '<sync-mailbox><enter-command>source ~/.mutt/system/muttrc<enter><change-folder>!<enter>'
+
+#set folder = "~/.mail"
+source ~/.mutt/personal/muttrc
+
+## Cache
+set header_cache=~/.mutt/cache/headers
+set message_cachedir=~/.mutt/cache/bodies
+set certificate_file=~/.mutt/certificates
+
+## Behavior
+set move = no
+
+set imap_check_subscribed
+
+ignore "Authentication-Results:"
+ignore "DomainKey-Signature:"
+ignore "DKIM-Signature:"
+
+set send_charset="utf-8"
+
+set wait_key = no
+
+set beep_new
+set thorough_search
+
+set hidden_host
+set editor="TERM=xterm-256color nvim +8 -c 'set tw=72 ft=mail noautoindent'"
+set fast_reply
+set edit_headers = yes
+set pipe_decode
+set include
+set delete
+set quit
+
+set smart_wrap
+set nomark_old
+auto_view text/html
+
+set auto_tag = yes
+
+macro index,pager \Cu "|urlview<enter>" "call urlview to open links"
+macro attach,compose \Cu "|urlview<enter>" "call urlview to open links"
+#macro index,pager \Cu "<pipe-message> urlscan -b<Enter>" "call urlscan to extract URLs out of a message"
+#macro attach,compose \Cu "<pipe-entry> urlscan -b<Enter>" "call urlscan to extract URLs out of a message"
+
+## Status bar
+set status_chars  = " *%A"
+set status_format = "───[ Folder: %f ]───[%r%m messages%?n? (%n new)?%?d? (%d to delete)?%?t? (%t tagged)? ]───%>─%?p?( %p postponed )?───"
+
+## Headers
+ignore *                                # ignore all headers
+unignore From: Organization: To: Cc: Date: Subject:   # show only these
+unhdr_order *                           # some distros order things by default
+hdr_order From: Organization: To: Cc: Date: Subject:  # and in this order
+
+## Index
+set date_format = "%Y/%m/%d %H:%M"
+set index_format = "[%Z]  %D  %-20.20F  %?y?{%.20Y} ?%s"
+#set index_format="%4C %Z %?GI?%GI& ? %[%d/%b]  %-16.15F %?M?(%3M)&     ? %s %> %?g?%g?"
+set sort = threads                         # like gmail
+set sort_aux = reverse-last-date-received  # like gmail
+set uncollapse_jump                        # don't collapse on an unread message
+set sort_re                                # thread based on regex
+set reply_regexp = "^(([Rr][Ee]?(\[[0-9]+\])?: *)?(\[[^]]+\] *)?)*"
+
+bind index R        group-reply
+bind pager R        group-reply
+bind index <tab>    sync-mailbox
+bind index <space>  collapse-thread
+bind index gg       first-entry
+bind index G        last-entry
+
+## Postpone
+bind compose p postpone-message
+bind index p recall-message
+
+## Contacts
+set display_filter="~/.mutt/add-address.sh"
+#set query_command = "contacts -Sf '%eTOKEN%n' '%s' | sed -e 's/TOKEN/\t/g'"
+#set query_command = "~/bin/venv-goobook query '%s'"
+#set query_command = "lbdbq %s 2>/dev/null"
+set query_command = "lbdbq %s 2>/dev/null; pc_query -m %s"
+bind editor <Tab> complete-query
+bind editor ^T    complete
+
+## Fix forwarding
+# subject line for forwarded messages
+set forward_format="Fwd: %s"
+# Don't decode MIME messages to text/plain when forwarding
+set forward_decode=no
+# forward including attachments
+set mime_forward=yes
+set mime_forward_rest=yes
+
+## Pager (mail view)
+set pager_index_lines = 10 # number of index lines to show
+set pager_context = 3      # number of context lines to show
+set pager_stop             # don't go to next message automatically
+set menu_scroll            # scroll in menus
+set tilde                  # show tildes like in vim
+unset markers              # no ugly plus signs
+
+set quote_regexp = "^( {0,4}[>|:#%]| {0,4}[a-z0-9]+[>|]+)+"
+alternative_order text/plain text/enriched text/html text/* application/ics
+
+bind pager k  previous-line
+bind pager j  next-line
+bind pager gg top
+bind pager G  bottom
+
+# View attachments properly.
+bind attach <return> view-mailcap
+
+## Color scheme
+#source ~/.mutt/colors
+#source ~/.mutt/mutt-colors-solarized/mutt-colors-solarized-light-16.muttrc
+
+## Attachments
+set mailcap_path = "~/.mutt/mailcap"
+# Add attachments with GUI dialog
+macro compose a "<shell-escape>~/.mutt/attach-file.sh<enter><enter-command>source /tmp/muttpick<enter>" "Attach with GUI"
+
+## Hotkeys
+bind editor <space> noop
+macro index gi "<change-folder>=INBOX<enter>" "Go to inbox"
+
+bind index B bounce-message
+
+## GPG
+set pgp_decode_command="gpg %?p?--passphrase-fd 0? --no-verbose --batch --output - %f"
+set pgp_verify_command="gpg --no-verbose --batch --output - --verify %s %f"
+set pgp_decrypt_command="gpg --passphrase-fd 0 --no-verbose --batch --output - %f"
+set pgp_sign_command="gpg --no-verbose --batch --output - --passphrase-fd 0 --armor --detach-sign --textmode %?a?-u %a? %f"
+set pgp_clearsign_command="gpg --no-verbose --batch --output - --passphrase-fd 0 --armor --textmode --clearsign %?a?-u %a? %f"
+set pgp_encrypt_only_command="/usr/lib/mutt/pgpewrap gpg --batch --quiet --no-verbose --output - --encrypt --textmode --armor --always-trust --encrypt-to <gpgid> -- -r %r -- %f"
+set pgp_encrypt_sign_command="/usr/lib/mutt/pgpewrap gpg --passphrase-fd 0 --batch --quiet --no-verbose --textmode --output - --encrypt --sign %?a?-u %a? --armor --always-trust --encrypt-to <gpgid> -- -r %r -- %f"
+set pgp_import_command="gpg --no-verbose --import -v %f"
+set pgp_export_command="gpg --no-verbose --export --armor %r"
+set pgp_verify_key_command="gpg --no-verbose --batch --fingerprint --check-sigs %r"
+set pgp_list_pubring_command="gpg --no-verbose --batch --with-colons --list-keys %r"
+set pgp_list_secring_command="gpg --no-verbose --batch --with-colons --list-secret-keys %r"
+set pgp_autosign=yes
+set pgp_sign_as=<gpgid>
+set pgp_replyencrypt=yes
+set pgp_timeout=1800
+set pgp_good_sign="^gpg: Good signature from"
+
+## Labels
+macro index x "<enter-command>set editor=\"~/bin/editlabel append\"\n\
+    <edit><sync-mailbox><enter>i\
+    <enter-command>set editor=vim\n" "Append label"
+macro pager x "<enter-command>set editor=\"~/bin/editlabel append\"\n\
+    <edit><sync-mailbox><enter>i\
+    <enter-command>set editor=vim\n" "Append label"
+macro index X "<enter-command>set editor=\"~/bin/editlabel menu\"\n\
+    <edit><sync-mailbox><enter>i\
+    <enter-command>set editor=vim\n" "Edit labels"
+macro pager X "<enter-command>set editor=\"~/bin/editlabel menu\"\n\
+    <edit><sync-mailbox><enter>i\
+    <enter-command>set editor=vim\n" "Edit labels"
+macro index \Cx "<limit>~y " "Limit view to label"
+
+## Notmuch
+macro index <F8> \
+"<enter-command>set my_old_pipe_decode=\$pipe_decode my_old_wait_key=\$wait_key nopipe_decode nowait_key<enter>\
+<shell-escape>notmuch-mutt -r --prompt search<enter>\
+<change-folder-readonly>`echo ${XDG_CACHE_HOME:-$HOME/.cache}/notmuch/mutt/results`<enter>\
+<enter-command>set pipe_decode=\$my_old_pipe_decode wait_key=\$my_old_wait_key<enter>" \
+      "notmuch: search mail"
+
+macro index <F9> \
+"<enter-command>set my_old_pipe_decode=\$pipe_decode my_old_wait_key=\$wait_key nopipe_decode nowait_key<enter>\
+<pipe-message>notmuch-mutt -r thread<enter>\
+<change-folder-readonly>`echo ${XDG_CACHE_HOME:-$HOME/.cache}/notmuch/mutt/results`<enter>\
+<enter-command>set pipe_decode=\$my_old_pipe_decode wait_key=\$my_old_wait_key<enter>" \
+      "notmuch: reconstruct thread"
+
+macro index <F6> \
+"<enter-command>set my_old_pipe_decode=\$pipe_decode my_old_wait_key=\$wait_key nopipe_decode nowait_key<enter>\
+<pipe-message>notmuch-mutt tag -- -inbox<enter>\
+<enter-command>set pipe_decode=\$my_old_pipe_decode wait_key=\$my_old_wait_key<enter>" \
+      "notmuch: remove message from inbox"
+
+## Alternate Notmuch use, following will search only current folder
+# 'L' performs a notmuch query, showing only the results
+macro index L "<enter-command>unset wait_key<enter><shell-escape>read -p 'notmuch query: ' x; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`notmuch search --output=messages \$(cat ~/.cache/mutt_terms) | head -n 600 | perl -le '@a=<>;chomp@a;s/\^id:// for@a;$,=\"|\";print@a'\`\"<enter>" "show only messages matching a notmuch pattern"
+# 'a' shows all messages again (supersedes default <alias> binding)
+macro index a "<limit>all\n" "show all messages (undo limit)"
+
+## Sidebar
+#set sidebar_visible = yes
+#set sidebar_width = 25
+#color sidebar_new yellow default
+#set sort_sidebar = unsorted
+#set sidebar_delim = " "
+#color sidebar yellow blue
+#
+#macro index b '<enter-command>toggle sidebar_visible<enter><refresh>'
+#macro pager b '<enter-command>toggle sidebar_visible<enter><redraw-screen>'
+#
+## Ctrl-n, Ctrl-p to select next, previous folder.
+## Ctrl-o to open selected folder.
+#bind index,pager \CP sidebar-prev
+#bind index,pager \CN sidebar-next
+#bind index,pager \CO sidebar-open
+#
+#bind index <left> sidebar-prev
+#bind index <right> sidebar-next
+#bind index <space> sidebar-open
+#
+### Notmuch
+#set nm_default_uri="notmuch:///home/filip/.mail"
+#set nm_record = yes
+##set virtual_spoolfile = yes
+#
+#tag-transforms "inbox"   "i"   \
+#               "unread"  "u"   \
+#               "replied" "↻ "  \
+#               "sent"    "➥ "  \
+#               "todo"    "T"   \
+#               "deleted" "DEL" \
+#               "invites" "CAL"

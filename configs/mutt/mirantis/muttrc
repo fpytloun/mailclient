@@ -1,0 +1,33 @@
+## SMTP
+set from = "fpytloun@mirantis.com"
+set realname = "Filip Pytloun"
+unset signature
+#set signature = "~/.mutt/mirantis/signature"
+
+my_hdr Organization: Mirantis, http://www.mirantis.com
+unmy_hdr X-URL
+
+## Folders
+set folder = "~/.mail/mirantis/"
+set spoolfile = "+INBOX"
+set postponed = "+postponed"
+set record = "+sent"
+set mbox = "+all"
+#set trash = "+trash"
+
+unmailboxes *
+source ~/.mutt/mirantis/mailboxes
+
+## Hotkeys
+macro index,pager y "<save-message>=all<enter><enter>" "Archive"
+macro index,pager d "<save-message>=trash<enter><enter>" "Trash"
+macro index gi "<change-folder>=INBOX<enter>" "Go to all mail"
+macro index ga "<change-folder>=all<enter>" "Go to all mail"
+macro index gs "<change-folder>=sent<enter>" "Go to sent"
+macro index gd "<change-folder>=postponed<enter>" "Go to drafts"
+
+# Add invitation into calendar
+macro attach A "<pipe-message>~/.mutt/vcalendar-filter.pl | ~/.mutt/mirantis/mutt2khal<enter>"
+
+## Theme
+source ~/.mutt/mirantis/colors

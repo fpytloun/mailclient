@@ -1,0 +1,33 @@
+## SMTP
+set from = "filip@pytloun.cz"
+set realname = "Filip Pytloun"
+unset signature
+
+# Headers
+unmy_hdr Organization
+my_hdr X-URL: http://fpy.cz
+
+## Folders
+set folder = "~/.mail/personal/"
+set spoolfile = "+INBOX"
+set postponed = "+postponed"
+set record = "+sent"
+set mbox = "+all"
+#set trash = "+trash"
+
+unmailboxes *
+source ~/.mutt/personal/mailboxes
+
+## Hotkeys
+macro index,pager y "<save-message>=all<enter><enter>" "Archive"
+macro index,pager d "<save-message>=trash<enter><enter>" "Trash"
+macro index gi "<change-folder>=INBOX<enter>" "Go to all mail"
+macro index ga "<change-folder>=all<enter>" "Go to all mail"
+macro index gs "<change-folder>=sent<enter>" "Go to sent"
+macro index gd "<change-folder>=postponed<enter>" "Go to drafts"
+
+# Add invitation into calendar
+macro attach A "<pipe-message>~/.mutt/vcalendar-filter.pl | ~/.mutt/personal/mutt2khal<enter>"
+
+## Theme
+source ~/.mutt/personal/colors

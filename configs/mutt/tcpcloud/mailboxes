@@ -1,0 +1,5 @@
+mailboxes "+INBOX"
+mailboxes "+archive"
+mailboxes "+postponed"
+mailboxes "+sent"
+mailboxes "+trash"

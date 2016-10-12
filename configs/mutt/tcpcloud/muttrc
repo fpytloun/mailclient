@@ -1,0 +1,32 @@
+## SMTP
+set from = "filip.pytloun@tcpcloud.eu"
+set realname = "Filip Pytloun"
+set signature = "~/.mutt/tcpcloud/signature"
+
+my_hdr Organization: tcp cloud, http://www.tcpcloud.eu
+unmy_hdr X-URL
+
+## Folders
+set folder = "~/.mail/tcpcloud/"
+set spoolfile = "+INBOX"
+set postponed = "+postponed"
+set record = "+sent"
+set mbox = "+archive"
+set trash = "+trash"
+
+unmailboxes *
+source ~/.mutt/tcpcloud/mailboxes
+
+## Hotkeys
+macro index,pager y "<save-message>=archive<enter><enter>" "Archive"
+macro index,pager d "<save-message>=trash<enter>" "Trash"
+macro index gi "<change-folder>=INBOX<enter>" "Go to all mail"
+macro index ga "<change-folder>=archive<enter>" "Go to archive"
+macro index gs "<change-folder>=sent<enter>" "Go to sent"
+macro index gd "<change-folder>=postponed<enter>" "Go to drafts"
+
+# Add invitation into calendar
+macro attach A "<pipe-message>~/.mutt/vcalendar-filter.pl | ~/.mutt/tcpcloud/mutt2khal<enter>"
+
+## Theme
+source ~/.mutt/tcpcloud/colors

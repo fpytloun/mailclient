@@ -1,0 +1,145 @@
+[general]
+ui = ttyui
+accounts = personal,tcpcloud,mirantis
+pythonfile = ~/.mail/utf7.py
+#maxsyncaccounts = 3
+socktimeout = 120
+fsync = false
+
+#[mbnames]
+#enabled = yes
+#filename = ~/.mutt/mailboxes
+#header = "mailboxes "
+#peritem = "+%(foldername)s"
+#sep = "\nmailboxes "
+#footer = "\n"
+
+## GMail - personal
+[Account personal]
+localrepository = Gmail-Local
+remoterepository = Gmail-Remote
+status_backend = sqlite
+autorefresh = 5
+quick       = 10
+postsynchook = notmuch new
+
+[Repository Gmail-Local]
+type = Maildir
+localfolders = ~/.mail/personal
+sep = .
+restoreatime = no
+
+[Repository Gmail-Remote]
+type = Gmail
+remotehost = imap.gmail.com
+ssl = yes
+remoteuser = filip@pytloun.cz
+remotepass = <password>
+auth_mechanisms = PLAIN
+realdelete = no
+#maxconnections = 3
+keepalive = 60
+holdconnectionopen = yes
+idlefolders = ['INBOX']
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+folderfilter = lambda folder: folder.decode('imap4-utf-7').encode('utf-8') in\
+	['INBOX', '[Gmail]/Odeslaná pošta', '[Gmail]/Koncepty', '[Gmail]/Všechny zprávy', '[Gmail]/Koš']
+nametrans = lambda foldername:\
+	re.sub('^\[Gmail\]/Odeslaná pošta$', 'sent',
+	re.sub('^\[Gmail\]/Koncepty$', 'postponed',
+	re.sub('^\[Gmail\]/Koš$', 'trash',
+	re.sub('^\[Gmail\]/Všechny zprávy$', 'all', foldername.decode('imap4-utf-7').encode('utf-8')))))
+
+## tcpcloud
+[Account tcpcloud]
+localrepository = tcpcloud-Local
+remoterepository = tcpcloud-Remote
+status_backend = sqlite
+autorefresh = 5
+quick       = 10
+postsynchook = notmuch new
+
+[Repository tcpcloud-Local]
+type = Maildir
+localfolders = ~/.mail/tcpcloud
+sep = .
+restoreatime = no
+
+[Repository tcpcloud-Remote]
+type = IMAP
+remotehost = mail.tcpcloud.eu
+ssl = yes
+remoteuser = filip.pytloun@tcpcloud.eu
+remotepass = <password>
+auth_mechanisms = PLAIN
+realdelete = no
+#maxconnections = 3
+keepalive = 60
+holdconnectionopen = yes
+idlefolders = ['INBOX']
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+folderfilter = lambda folder: folder.decode('imap4-utf-7').encode('utf-8') in\
+	['INBOX', 'Sent', 'Drafts', 'Archive', 'Trash']
+nametrans = lambda foldername:\
+	re.sub('^Sent$', 'sent',
+	re.sub('^Drafts$', 'postponed',
+	re.sub('^Trash$', 'trash',
+	re.sub('^Archive$', 'archive', foldername.decode('imap4-utf-7').encode('utf-8')))))
+
+[Repository tcpcloud-Remote-Exchange]
+type = IMAP
+remotehost = exchange.neotech.cz
+ssl = yes
+remoteuser = filip.pytloun@tcpcloud.eu
+remotepass = <password>
+realdelete = no
+#maxconnections = 1
+keepalive = 60
+holdconnectionopen = yes
+idlefolders = ['INBOX']
+#sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+cert_fingerprint = b9f266330d02ba53bafcd72506e95a7a53b1fe69
+folderfilter = lambda folder: folder.decode('imap4-utf-7').encode('utf-8') in\
+	['INBOX', 'Odeslaná pošta', 'Koncepty', 'Archive', 'Odstraněná pošta']
+nametrans = lambda foldername:\
+	re.sub('^Odeslaná pošta$', 'sent',
+	re.sub('^Koncepty$', 'postponed',
+	re.sub('^Odstraněná pošta$', 'trash',
+	re.sub('^Archive$', 'archive', foldername.decode('imap4-utf-7').encode('utf-8')))))
+
+## GMail - Mirantis
+[Account mirantis]
+localrepository = Mirantis-Local
+remoterepository = Mirantis-Remote
+status_backend = sqlite
+autorefresh = 5
+quick       = 10
+postsynchook = notmuch new
+
+[Repository Mirantis-Local]
+type = Maildir
+localfolders = ~/.mail/mirantis
+sep = .
+restoreatime = no
+
+[Repository Mirantis-Remote]
+type = Gmail
+remotehost = imap.gmail.com
+ssl = yes
+remoteuser = fpytloun@mirantis.com
+# App password to bypass 2step auth
+remotepass = <password>
+auth_mechanisms = PLAIN
+realdelete = no
+#maxconnections = 3
+keepalive = 60
+holdconnectionopen = yes
+idlefolders = ['INBOX']
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+folderfilter = lambda folder: folder.decode('imap4-utf-7').encode('utf-8') in\
+	['INBOX', '[Gmail]/Sent Mail', '[Gmail]/Drafts', '[Gmail]/All Mail', '[Gmail]/Trash']
+nametrans = lambda foldername:\
+	re.sub('^\[Gmail\]/Sent Mail$', 'sent',
+	re.sub('^\[Gmail\]/Drafts$', 'postponed',
+	re.sub('^\[Gmail\]/Trash$', 'trash',
+	re.sub('^\[Gmail\]/All Mail$', 'all', foldername.decode('imap4-utf-7').encode('utf-8')))))
