@@ -10,6 +10,7 @@ Setup
 - offlineimap for fetching mail from remote IMAP
 - mutt as MUA (Mail User Agent)
 - notmuch for indexing and searching local mailbox
+- postfix as MTA (for sending email = relaying to proper SMTP server)
 
 Optional for extended functionality:
 
@@ -20,6 +21,9 @@ Optional for extended functionality:
 
 Installation
 ============
+
+MUA
+---
 
 Replace placeholders
 
@@ -36,3 +40,27 @@ Copy to proper locations
     cp -r configs/lbdbrc ~/.lbdbrc
 
 Edit ``~/.mutt/mailcap`` to run your favorite applications.
+
+Postfix
+-------
+
+Now a little tricky part, you need to setup some way to send emails. My
+favorite approach is to setup local MTA (postfix) and setup it to relay mails
+to proper SMTP servers by sender.
+
+::
+
+    apt-get install postfix
+    sudo cp -r configs/postfix/* /etc/postfix/
+    sudo chmod 600 /etc/postfix/sasl/security
+
+Then edit ``main.cf``, ``generic``, ``relayhost_map``, ``sasl/security``
+according to your needs.
+
+Finally create maps:
+
+::
+
+    postmap /etc/postfix/sasl/security
+    postmap /etc/postfix/generic
+    postmap /etc/sasl/relayhost_map
